@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerlessEmailServer", "ServerlessEmailServer\ServerlessEmailServer.csproj", "{9404F610-8B05-4B7B-BA7D-BFA67E92E5BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BKey.Email.Serverless.EmailIngestion", "BKey.Email.Serverless.EmailIngestion\BKey.Email.Serverless.EmailIngestion.csproj", "{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BKey.Email.Serverless.Infra", "BKey.Email.Serverless.Infra\BKey.Email.Serverless.Infra.csproj", "{B72CB892-7196-4F14-BB51-083D70AA092E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +32,29 @@ Global
 		{9404F610-8B05-4B7B-BA7D-BFA67E92E5BE}.Release|x64.Build.0 = Release|Any CPU
 		{9404F610-8B05-4B7B-BA7D-BFA67E92E5BE}.Release|x86.ActiveCfg = Release|Any CPU
 		{9404F610-8B05-4B7B-BA7D-BFA67E92E5BE}.Release|x86.Build.0 = Release|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Debug|x64.Build.0 = Debug|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Debug|x86.Build.0 = Debug|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Release|x64.ActiveCfg = Release|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Release|x64.Build.0 = Release|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B0CFD6B-C1CD-406D-9226-EF5F5CDC08E6}.Release|x86.Build.0 = Release|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Debug|x64.Build.0 = Debug|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Debug|x86.Build.0 = Debug|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Release|x64.ActiveCfg = Release|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Release|x64.Build.0 = Release|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Release|x86.ActiveCfg = Release|Any CPU
+		{B72CB892-7196-4F14-BB51-083D70AA092E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
