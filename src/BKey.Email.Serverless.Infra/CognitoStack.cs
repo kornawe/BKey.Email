@@ -3,7 +3,7 @@ using Amazon.CDK.AWS.Cognito;
 using Amazon.CDK.AWS.Route53;
 using Amazon.CDK.AWS.CertificateManager;
 
-namespace ServerlessEmailServer;
+namespace BKey.Emai.Serverless.Infra;
 
 public class CognitoStack : Stack
 {

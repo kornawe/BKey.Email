@@ -1,6 +1,6 @@
 using Amazon.CDK;
 
-namespace ServerlessEmailServer;
+namespace BKey.Emai.Serverless.Infra;
 
 public class CognitoStackProps : StackProps
 {

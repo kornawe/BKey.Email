@@ -5,7 +5,7 @@ using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.SES;
 using Amazon.CDK.AWS.IAM;
 
-namespace ServerlessEmailServer;
+namespace BKey.Emai.Serverless.Infra;
 
 public class ServerlessEmailServerStack : Stack
 {
