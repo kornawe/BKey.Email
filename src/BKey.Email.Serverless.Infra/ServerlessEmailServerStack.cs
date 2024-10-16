@@ -4,6 +4,7 @@ using Amazon.CDK.AWS.DynamoDB;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.SES;
 using Amazon.CDK.AWS.IAM;
+using Constructs;
 
 namespace BKey.Emai.Serverless.Infra;
 

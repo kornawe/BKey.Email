@@ -2,6 +2,7 @@
 using Amazon.CDK.AWS.APIGateway;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
+using Constructs;
 using System.IO;
 
 namespace BKey.Email.Serverless.Infra;
@@ -15,7 +16,7 @@ public class ImapServerStack : Stack
         // LOGIN Lambda
         var loginLambda = new Function(this, $"IMAPLoginLambdaHandler-{environmentName}", new FunctionProps
         {
-            Runtime = Runtime.DOTNET_6,
+            Runtime = Runtime.DOTNET_8,
             Handler = "IMAPServerLambdas.Login::IMAPServerLambdas.LoginFunction::FunctionHandler",
             Code = Code.FromAsset("src/IMAPServerLambdas/bin/Release/net6.0"),
             Timeout = Duration.Seconds(30),
@@ -24,7 +25,7 @@ public class ImapServerStack : Stack
         // SELECT Lambda
         var selectLambda = new Function(this, "IMAPSelectLambdaHandler", new FunctionProps
         {
-            Runtime = Runtime.DOTNET_6,
+            Runtime = Runtime.DOTNET_8,
             Handler = "IMAPServerLambdas.Select::IMAPServerLambdas.SelectFunction::FunctionHandler",
             Code = Code.FromAsset("src/IMAPServerLambdas/bin/Release/net6.0"),
             Timeout = Duration.Seconds(30),
@@ -33,7 +34,7 @@ public class ImapServerStack : Stack
         // FETCH Lambda
         var fetchLambda = new Function(this, "IMAPFetchLambdaHandler", new FunctionProps
         {
-            Runtime = Runtime.DOTNET_6,
+            Runtime = Runtime.DOTNET_8,
             Handler = "IMAPServerLambdas.Fetch::IMAPServerLambdas.FetchFunction::FunctionHandler",
             Code = Code.FromAsset("src/IMAPServerLambdas/bin/Release/net6.0"),
             Timeout = Duration.Seconds(30),
