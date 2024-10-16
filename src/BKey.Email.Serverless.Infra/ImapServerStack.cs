@@ -18,30 +18,30 @@ public class ImapServerStack : Stack
         {
             Runtime = Runtime.DOTNET_8,
             Handler = "IMAPServerLambdas.Login::IMAPServerLambdas.LoginFunction::FunctionHandler",
-            Code = Code.FromAsset("src/IMAPServerLambdas/bin/Release/net6.0"),
+            Code = Code.FromAsset(GetLambdaOutputPath()),
             Timeout = Duration.Seconds(30),
         });
 
         // SELECT Lambda
-        var selectLambda = new Function(this, "IMAPSelectLambdaHandler", new FunctionProps
+        var selectLambda = new Function(this, $"IMAPSelectLambdaHandler-{environmentName}", new FunctionProps
         {
             Runtime = Runtime.DOTNET_8,
             Handler = "IMAPServerLambdas.Select::IMAPServerLambdas.SelectFunction::FunctionHandler",
-            Code = Code.FromAsset("src/IMAPServerLambdas/bin/Release/net6.0"),
+            Code = Code.FromAsset(GetLambdaOutputPath()),
             Timeout = Duration.Seconds(30),
         });
 
         // FETCH Lambda
-        var fetchLambda = new Function(this, "IMAPFetchLambdaHandler", new FunctionProps
+        var fetchLambda = new Function(this, $"IMAPFetchLambdaHandler-{environmentName}", new FunctionProps
         {
             Runtime = Runtime.DOTNET_8,
             Handler = "IMAPServerLambdas.Fetch::IMAPServerLambdas.FetchFunction::FunctionHandler",
-            Code = Code.FromAsset("src/IMAPServerLambdas/bin/Release/net6.0"),
+            Code = Code.FromAsset(GetLambdaOutputPath()),
             Timeout = Duration.Seconds(30),
         });
 
         // Create an API Gateway to expose IMAP-related endpoints
-        var api = new RestApi(this, "IMAPApiGateway", new RestApiProps
+        var api = new RestApi(this, $"IMAPApiGateway-{environmentName}", new RestApiProps
         {
             RestApiName = "IMAP Service",
             Description = "API Gateway for IMAP server endpoints.",
@@ -72,13 +72,13 @@ public class ImapServerStack : Stack
         }
     }
 
-    private string GetLambdaOutputPath(string lambdaFolder)
+    private string GetLambdaOutputPath()
     {
         // Get the current directory of the CDK process
         var currentDirectory = Directory.GetCurrentDirectory();
 
         // Navigate to the Lambda project directory (assuming a structure like 'src/IMAPServerLambdas')
-        var lambdaPath = Path.Combine(currentDirectory, $"../src/{lambdaFolder}/bin/Release/net6.0");
+        var lambdaPath = currentDirectory;
 
         if (!Directory.Exists(lambdaPath))
         {
