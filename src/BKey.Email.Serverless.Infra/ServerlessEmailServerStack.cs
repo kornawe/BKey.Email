@@ -1,72 +1,109 @@
 using Amazon.CDK;
-using Amazon.CDK.AWS.S3;
-using Amazon.CDK.AWS.DynamoDB;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.SES;
-using Amazon.CDK.AWS.IAM;
+using Amazon.CDK.AWS.SES.Actions;
+using Amazon.CDK.AWS.SNS;
+using Amazon.CDK.AWS.SNS.Subscriptions;
+using Amazon.CDK.AWS.SQS;
+using Amazon.CDK.AWS.Lambda.EventSources;
+using Amazon.CDK.AWS.S3;
+using Amazon.CDK.AWS.DynamoDB;
 using Constructs;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
-namespace BKey.Emai.Serverless.Infra;
-
-public class ServerlessEmailServerStack : Stack
+namespace BKey.Emai.Serverless.Infra
 {
-    internal ServerlessEmailServerStack(Construct scope, string id, ServerlessEmailStackProps props) : base(scope, id, props)
+    public class ServerlessEmailServerStack : Stack
     {
-        string environmentName = props.EnvironmentName.ToLower();
-        string domainName = props.DomainName;
-
-        // Create an S3 bucket to hold emails
-        var emailBucket = new Bucket(this, $"{environmentName}-EmailBucket", new BucketProps
+        public ServerlessEmailServerStack(Construct scope, string id, ServerlessEmailStackProps props)
+            : base(scope, id, props)
         {
-            BucketName = $"{environmentName}-emails-bucket",
-            Versioned = true,
-            RemovalPolicy = RemovalPolicy.DESTROY
-        });
+            var envName = props.EnvironmentName.ToLowerInvariant();
 
-        // Create a DynamoDB table to hold metadata information
-        var emailMetadataTable = new Table(this, $"{environmentName}-EmailMetadataTable", new TableProps
-        {
-            TableName = $"{environmentName}-email-metadata",
-            PartitionKey = new Attribute
+            // Create an S3 bucket for storing emails
+            var emailBucket = new Bucket(this, $"{envName}-EmailBucket", new BucketProps
             {
-                Name = "MessageId",
-                Type = AttributeType.STRING
-            },
-            BillingMode = BillingMode.PAY_PER_REQUEST,
-            RemovalPolicy = RemovalPolicy.DESTROY
-        });
+                BucketName = $"{envName}-email-storage-{props.DomainName}".Replace(".", "-"),
+                Encryption = BucketEncryption.S3_MANAGED,
+                RemovalPolicy = RemovalPolicy.DESTROY
+            });
 
-        // Set up SES to ingest emails
-        var emailIdentity = new CfnEmailIdentity(this, $"{environmentName}-EmailIdentity", new CfnEmailIdentityProps
-        {
-            EmailIdentity = domainName
-        });
+            // Create a DynamoDB table for storing email metadata
+            var emailMetadataTable = new Table(this, $"{envName}EmailMetadataTable", new TableProps
+            {
+                TableName = $"{envName}-EmailMetadata-{props.DomainName}".Replace(".", "-"),
+                PartitionKey = new Amazon.CDK.AWS.DynamoDB.Attribute { Name = "Id", Type = AttributeType.STRING },
+                BillingMode = BillingMode.PAY_PER_REQUEST,
+                RemovalPolicy = RemovalPolicy.DESTROY
+            });
 
-        // Create an IAM role for the Lambda function
-        var lambdaRole = new Role(this, $"{environmentName}-LambdaRole", new RoleProps
-        {
-            AssumedBy = new ServicePrincipal("lambda.amazonaws.com")
-        });
-        lambdaRole.AddToPolicy(new PolicyStatement(new PolicyStatementProps
-        {
-            Actions = new[] { "s3:PutObject", "s3:GetObject" },
-            Resources = new[] { emailBucket.BucketArn + "/*" }
-        }));
-        lambdaRole.AddToPolicy(new PolicyStatement(new PolicyStatementProps
-        {
-            Actions = new[] { "dynamodb:PutItem", "dynamodb:GetItem" },
-            Resources = new[] { emailMetadataTable.TableArn }
-        }));
+            // Create an SNS topic for incoming emails
+            var incomingEmailTopic = new Topic(this, $"{envName}IncomingEmailTopic", new TopicProps
+            {
+                TopicName = $"{envName}-incoming-email-topic-{props.DomainName}".Replace(".", "-")
+            });
 
-        // Create a Lambda function to ingest emails
-        var emailIngestLambda = new Function(this, $"{environmentName}-EmailIngestLambda", new FunctionProps
-        {
-            FunctionName = $"{environmentName}-email-ingest",
-            Runtime = Runtime.NODEJS_14_X,
-            Handler = "index.handler",
-            Code = Code.FromAsset("lambda"), // Placeholder for Lambda code directory
-            Role = lambdaRole
-            
-        });
+            // Create an SQS queue for processing emails
+            var emailProcessingQueue = new Queue(this, $"{envName}EmailProcessingQueue", new QueueProps
+            {
+                QueueName = $"{envName}-email-processing-queue-{props.DomainName}".Replace(".", "-")
+            });
+
+            // Subscribe the SQS queue to the SNS topic
+            incomingEmailTopic.AddSubscription(new SqsSubscription(emailProcessingQueue));
+
+            // Create a Lambda function to process emails
+            var emailProcessingFunction = new Function(this, $"{envName}EmailProcessingFunction", new FunctionProps
+            {
+                FunctionName = $"{envName}-email-processor-{props.DomainName}".Replace(".", "-"),
+                Runtime = Runtime.DOTNET_6,
+                Handler = "BKey.Email.Serverless::BKey.Email.Serverless.Function::FunctionHandler",
+                Code = Code.FromAsset("../BKey.Email.Serverless/src/BKey.Email.Serverless/bin/Release/net6.0/publish"),
+                Environment = new Dictionary<string, string>
+                {
+                    { "QUEUE_URL", emailProcessingQueue.QueueUrl },
+                    { "BUCKET_NAME", emailBucket.BucketName },
+                    { "TABLE_NAME", emailMetadataTable.TableName },
+                    { "ENVIRONMENT_NAME", envName }
+                }
+            });
+
+            // Grant the Lambda function permissions
+            emailProcessingQueue.GrantConsumeMessages(emailProcessingFunction);
+            emailBucket.GrantReadWrite(emailProcessingFunction);
+            emailMetadataTable.GrantReadWriteData(emailProcessingFunction);
+
+            // Add the SQS queue as an event source for the Lambda function
+            emailProcessingFunction.AddEventSource(new SqsEventSource(emailProcessingQueue));
+
+            // Create an SES receipt rule set
+            var ruleSet = new ReceiptRuleSet(this, $"{envName}EmailRuleSet", new ReceiptRuleSetProps
+            {
+                ReceiptRuleSetName = $"{envName}-incoming-email-rule-set-{props.DomainName}".Replace(".", "-")
+            });
+
+            // Create an SES receipt rule
+            var rule = new ReceiptRule(this, $"{envName}EmailRule", new ReceiptRuleProps
+            {
+                RuleSet = ruleSet,
+                Recipients = new[] { props.DomainName },
+                Actions = new IReceiptRuleAction[]
+                {
+                    new AddHeader(new AddHeaderProps
+                    {
+                        Name = "X-Environment",
+                        Value = envName
+                    }),
+                    new Sns(new SnsProps
+                    {
+                        Topic = incomingEmailTopic
+                    })
+                },
+                ScanEnabled = true
+            });
+
+        }
     }
 }
