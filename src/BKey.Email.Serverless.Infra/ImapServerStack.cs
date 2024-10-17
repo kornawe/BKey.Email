@@ -73,18 +73,17 @@ public class ImapServerStack : Stack
     }
 
     private string GetLambdaOutputPath()
-    {
-        // Get the current directory of the CDK process
-        var currentDirectory = Directory.GetCurrentDirectory();
-
-        // Navigate to the Lambda project directory (assuming a structure like 'src/IMAPServerLambdas')
-        var lambdaPath = currentDirectory;
-
-        if (!Directory.Exists(lambdaPath))
         {
-            throw new DirectoryNotFoundException($"Lambda binaries not found in: {lambdaPath}");
-        }
+            var directory = new DirectoryInfo("src/BKey.Email.Imap/bin/Debug/net8.0/");
 
-        return lambdaPath;
-    }
+            // Navigate to the Lambda project directory (assuming a structure like 'src/IMAPServerLambdas')
+            var lambdaPath = directory.FullName;
+
+            if (!directory.Exists)
+            {
+                throw new DirectoryNotFoundException($"Lambda binaries not found in: {lambdaPath}");
+            }
+
+            return lambdaPath;
+        }
 }

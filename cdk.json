@@ -1,5 +1,5 @@
 {
-  "app": "dotnet run --project src/ServerlessEmailServer/ServerlessEmailServer.csproj",
+  "app": "dotnet run --project src/BKey.Email.Serverless.Infra/BKey.Email.Serverless.Infra.csproj",
   "watch": {
     "include": [
       "**"

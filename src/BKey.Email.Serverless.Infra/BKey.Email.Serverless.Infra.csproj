@@ -12,8 +12,4 @@
     <PackageReference Include="Constructs" Version="10.4.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BKey.Email.Imap\BKey.Email.Imap.csproj" />
-  </ItemGroup>
-
 </Project>

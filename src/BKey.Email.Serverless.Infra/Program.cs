@@ -1,4 +1,5 @@
 ﻿using Amazon.CDK;
+using System;
 
 namespace BKey.Emai.Serverless.Infra;
 
@@ -6,7 +7,9 @@ sealed class Program
 {
     public static void Main(string[] args)
     {
+        Console.WriteLine("Starting CDK");
         var app = new App();
+        Console.WriteLine("Stackkk");
         _ = new ServerlessEmailServerStack(app, "ServerlessEmailServerStack", new ServerlessEmailStackProps
         {
             // If you don't specify 'env', this stack will be environment-agnostic.
@@ -38,6 +41,8 @@ sealed class Program
             Description = "Serverless Email Stack",
             DomainName = "fosssauce.com"
         });
+        Console.WriteLine("Synthesizing");
         app.Synth();
+        Console.WriteLine("Finished");
     }
 }

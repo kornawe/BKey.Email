@@ -12,6 +12,7 @@ using Constructs;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace BKey.Emai.Serverless.Infra
 {
@@ -58,9 +59,9 @@ namespace BKey.Emai.Serverless.Infra
             var emailProcessingFunction = new Function(this, $"{envName}EmailProcessingFunction", new FunctionProps
             {
                 FunctionName = $"{envName}-email-processor-{props.DomainName}".Replace(".", "-"),
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_8,
                 Handler = "BKey.Email.Serverless::BKey.Email.Serverless.Function::FunctionHandler",
-                Code = Code.FromAsset("../BKey.Email.Serverless/src/BKey.Email.Serverless/bin/Release/net6.0/publish"),
+                Code = Code.FromAsset(GetLambdaOutputPath()),
                 Environment = new Dictionary<string, string>
                 {
                     { "QUEUE_URL", emailProcessingQueue.QueueUrl },
@@ -104,6 +105,21 @@ namespace BKey.Emai.Serverless.Infra
                 ScanEnabled = true
             });
 
+        }
+
+        private string GetLambdaOutputPath()
+        {
+            var directory = new DirectoryInfo("src/BKey.Email.Serverless.EmailIngestion/bin/Debug/net8.0/");
+
+            // Navigate to the Lambda project directory (assuming a structure like 'src/IMAPServerLambdas')
+            var lambdaPath = directory.FullName;
+
+            if (!directory.Exists)
+            {
+                throw new DirectoryNotFoundException($"Lambda binaries not found in: {lambdaPath}");
+            }
+
+            return lambdaPath;
         }
     }
 }
