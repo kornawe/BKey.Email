@@ -36,7 +36,7 @@ public class Function
     private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
     {
         // Parse the SNS message from the SQS event
-        var snsMessage = JsonSerializer.Deserialize<SNSMessage>(message.Body);
+        var snsMessage = JsonSerializer.Deserialize<SnsNotification>(message.Body);
         var sesMessage = JsonSerializer.Deserialize<SESMessage>(snsMessage.Message);
 
         // Generate a unique ID for the email
@@ -64,12 +64,6 @@ public class Function
 
         context.Logger.LogLine($"Processed message {message.MessageId}");
     }
-}
-
-// You'll need to define these classes based on the actual structure of your messages
-public class SNSMessage
-{
-    public string Message { get; set; }
 }
 
 public class SESMessage
